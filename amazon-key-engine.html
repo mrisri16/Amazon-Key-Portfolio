@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amazon Key AI Content Engine, Mridhula Srinivasan</title>
+<style>
+  :root{
+    --ink:#15181d;
+    --body:#33383f;
+    --muted:#6b727c;
+    --line:#e6e9ee;
+    --bg:#ffffff;
+    --soft:#f6f8fa;
+    --key:#5d564c;        /* warm graphite */
+    --key-dark:#3c372f;
+    --key-deep:#2a2620;
+    --amber:#8a7449;
+    --amber-bg:#f5f1e8;
+    --amber-line:#e8ddc8;
+    --red:#9c5f4e;
+    --red-bg:#f4efec;
+    --red-line:#e6dcd5;
+    --green:#5f6b4c;
+    --green-bg:#f1f2ec;
+    --green-line:#dde0d2;
+    --shadow:0 1px 2px rgba(40,36,32,.06),0 8px 28px rgba(40,36,32,.06);
+    --maxw:980px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;background:var(--bg);color:var(--body);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;
+  }
+  .serif{font-family:"Iowan Old Style",Georgia,"Times New Roman",serif;}
+  h1,h2,h3,.display{font-family:"Iowan Old Style",Georgia,"Times New Roman",serif;color:var(--ink);}
+  a{color:var(--key);}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 28px;}
+  .small{font-size:14px;}
+  .muted{color:var(--muted);}
+  .tag{display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+       color:var(--key-dark);background:#efece6;border:1px solid #e0dbd1;padding:3px 9px;border-radius:999px;}
+
+  /* NAV */
+  nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.9);backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--line);}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:56px;}
+  nav .brand{font-weight:800;font-size:15px;color:var(--ink);letter-spacing:.2px;}
+  nav .brand b{color:var(--key);}
+  nav ul{display:flex;gap:22px;list-style:none;margin:0;padding:0;}
+  nav a{color:var(--muted);text-decoration:none;font-size:13.5px;font-weight:600;}
+  nav a:hover,nav a.active{color:var(--key);}
+  @media(max-width:760px){nav ul{display:none;}}
+
+  /* HERO */
+  header.hero{background:
+      radial-gradient(1100px 380px at 78% -8%,#f1eee8 0%,rgba(241,238,232,0) 60%),
+      linear-gradient(180deg,#fcfbf8 0%,#ffffff 70%);
+      border-bottom:1px solid var(--line);}
+  .hero .wrap{padding-top:64px;padding-bottom:60px;}
+  .eyebrow{font-size:13px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--key);margin-bottom:18px;}
+  .hero h1{font-size:50px;line-height:1.05;margin:0 0 18px;letter-spacing:-.5px;}
+  .hero h1 em{font-style:italic;color:var(--key);}
+  .lede{font-size:21px;line-height:1.5;color:#41474f;max-width:760px;margin:0 0 26px;}
+  .lede b{color:var(--ink);font-weight:700;}
+  .byline{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;font-size:14.5px;color:var(--muted);}
+  .byline .who{font-weight:700;color:var(--ink);}
+  .byline a{color:var(--key);text-decoration:none;font-weight:600;}
+  .hero-stats{display:flex;flex-wrap:wrap;gap:14px;margin-top:34px;}
+  .stat{flex:1;min-width:150px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:var(--shadow);}
+  .stat .n{font-family:"Iowan Old Style",Georgia,serif;font-size:27px;color:var(--key-dark);font-weight:700;line-height:1;}
+  .stat .l{font-size:12.5px;color:var(--muted);margin-top:7px;line-height:1.35;}
+
+  /* SECTION */
+  section{padding:62px 0;border-bottom:1px solid var(--line);}
+  section.alt{background:var(--soft);}
+  .sec-head{max-width:760px;margin-bottom:34px;}
+  .sec-head .kicker{font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--key);margin-bottom:12px;}
+  .sec-head h2{font-size:34px;line-height:1.12;margin:0 0 14px;letter-spacing:-.3px;}
+  .sec-head p{font-size:18px;color:#454b53;margin:0;}
+
+  /* generic cards */
+  .grid{display:grid;gap:18px;}
+  .g2{grid-template-columns:repeat(2,1fr);}
+  .g3{grid-template-columns:repeat(3,1fr);}
+  @media(max-width:760px){.g2,.g3{grid-template-columns:1fr;}}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;box-shadow:var(--shadow);}
+  .card h3{font-size:19px;margin:0 0 8px;}
+  .card p{margin:0;font-size:15.5px;color:var(--body);}
+  .card .num{font-family:"Iowan Old Style",Georgia,serif;font-size:15px;color:var(--key);font-weight:700;}
+
+  /* pillars / voice principles */
+  .principle{display:flex;gap:14px;align-items:flex-start;}
+  .principle .dot{flex:0 0 auto;width:34px;height:34px;border-radius:9px;background:#eeeae3;color:var(--key-dark);
+      display:flex;align-items:center;justify-content:center;font-weight:800;font-family:Georgia,serif;}
+  .principle h3{font-size:17px;margin:2px 0 4px;}
+  .principle p{font-size:14.5px;}
+
+  /* lexicon */
+  .lex{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;}
+  @media(max-width:620px){.lex{grid-template-columns:1fr;}}
+  .lex .col{padding:20px 22px;}
+  .lex .use{background:var(--green-bg);}
+  .lex .avoid{background:var(--red-bg);border-left:1px solid var(--line);}
+  .lex h4{margin:0 0 10px;font-family:inherit;font-size:13px;letter-spacing:.1em;text-transform:uppercase;}
+  .lex .use h4{color:var(--green);}
+  .lex .avoid h4{color:var(--red);}
+  .lex ul{margin:0;padding-left:18px;}
+  .lex li{font-size:14.5px;margin-bottom:5px;}
+  .lex .avoid li{text-decoration:line-through;text-decoration-color:#d99;color:#8a5b58;}
+
+  /* code / prompt block */
+  .code{background:#26241f;color:#d8d1c6;border-radius:14px;padding:22px 22px;overflow:auto;
+     font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.62;border:1px solid #3a352d;}
+  .code .c-key{color:#d7ccb6;}
+  .code .c-rule{color:#cbb78f;}
+  .code .c-muted{color:#8c857a;}
+  .code .c-good{color:#a8b394;}
+  .code b{color:#fff;font-weight:700;}
+
+  /* architecture flow */
+  .flow{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap;}
+  .flow .node{flex:1 1 104px;min-width:100px;max-width:230px;background:#fff;border:1px solid var(--line);border-radius:13px;padding:14px;text-align:center;box-shadow:var(--shadow);}
+  .flow .node .ic{font-size:20px;}
+  .flow .node .t{font-weight:700;font-size:14px;color:var(--ink);margin-top:6px;}
+  .flow .node .s{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.3;}
+  .flow .arrow{display:flex;align-items:center;color:var(--key);font-size:20px;font-weight:700;}
+  @media(max-width:760px){.flow{flex-direction:column;}.flow .arrow{justify-content:center;transform:rotate(90deg);}}
+  .loopnote{margin-top:14px;font-size:14px;color:var(--muted);display:flex;gap:8px;align-items:center;}
+  .loopnote b{color:var(--key-dark);}
+
+  /* table */
+  table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;font-size:14.5px;}
+  th,td{text-align:left;padding:12px 15px;border-bottom:1px solid var(--line);vertical-align:top;}
+  th{background:var(--key-deep);color:#efeae2;font-family:inherit;font-size:12.5px;letter-spacing:.05em;text-transform:uppercase;}
+  tr:last-child td{border-bottom:none;}
+  td .d{color:var(--muted);font-size:13px;}
+  .pass{display:inline-block;background:var(--green-bg);color:var(--green);border:1px solid var(--green-line);font-weight:700;font-size:12px;padding:2px 8px;border-radius:6px;}
+
+  /* SAMPLE showcase */
+  .sample{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:24px;}
+  .sample .s-top{padding:18px 24px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#fcfbf8,#fff);}
+  .s-top .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+  .pill{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:999px;border:1px solid;}
+  .pill.b2c{color:#4c463d;background:#efece6;border-color:#e0dbd1;}
+  .pill.b2b{color:#5c5246;background:#f1ede6;border-color:#e3ddd0;}
+  .pill.fmt{color:#555;background:#f1f3f5;border-color:#e2e5e9;}
+  .s-top h3{font-size:21px;margin:11px 0 5px;}
+  .s-brief{font-size:14.5px;color:var(--muted);margin:0;}
+  .s-brief b{color:var(--body);}
+  .s-body{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+  @media(max-width:760px){.s-body{grid-template-columns:1fr;}}
+  .draft,.ship{padding:22px 24px;}
+  .draft{background:var(--red-bg);border-right:1px solid var(--line);}
+  .ship{background:var(--green-bg);}
+  @media(max-width:760px){.draft{border-right:none;border-bottom:1px solid var(--line);}}
+  .lab{display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;}
+  .draft .lab{color:var(--red);}
+  .ship .lab{color:var(--green);}
+  .copy{font-size:15px;line-height:1.5;color:#23272c;}
+  .copy .h{font-weight:700;font-size:16.5px;color:var(--ink);display:block;margin-bottom:4px;}
+  .copy .sub{display:block;margin-bottom:9px;}
+  .copy .cta{display:inline-block;margin-top:11px;background:var(--key);color:#fff;font-weight:700;font-size:13.5px;padding:7px 14px;border-radius:8px;}
+  .ship .copy .cta{background:var(--green);}
+  .copy ol,.copy ul{margin:8px 0;padding-left:20px;}
+  .copy li{margin-bottom:5px;}
+  .copy .slabel{font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700;}
+  .note{padding:16px 24px;background:var(--amber-bg);border-top:1px solid var(--amber-line);}
+  .note .lab{color:var(--amber);margin-bottom:7px;}
+  .note p{margin:0;font-size:14.5px;color:#5d4a23;line-height:1.55;}
+  .note p b{color:#3f3110;}
+
+  /* impact metrics */
+  .metric{display:flex;gap:14px;align-items:flex-start;padding:16px 0;border-bottom:1px solid var(--line);}
+  .metric:last-child{border-bottom:none;}
+  .metric .mk{flex:0 0 200px;font-weight:700;color:var(--ink);font-size:15px;}
+  .metric .mv{font-size:15px;color:var(--body);}
+  .metric .mv b{color:var(--key-dark);}
+  @media(max-width:620px){.metric{flex-direction:column;gap:4px;}.metric .mk{flex:none;}}
+
+  /* callout */
+  .callout{background:linear-gradient(165deg,#33302a,#46413a);color:#efeae2;border-radius:18px;padding:30px 32px;}
+  .callout h3{color:#fff;font-size:23px;margin:0 0 10px;}
+  .callout p{margin:0;font-size:16.5px;color:#d9d2c6;}
+  .callout b{color:#fff;}
+
+  footer{padding:54px 0 70px;background:#2a2620;color:#c4bcb0;}
+  footer h3{color:#fff;font-size:24px;margin:0 0 12px;}
+  footer a{color:#d9cfbf;}
+  .foot-links{display:flex;gap:22px;flex-wrap:wrap;margin:18px 0 26px;font-weight:600;}
+  .disc{font-size:12.5px;color:#9a9389;line-height:1.6;border-top:1px solid #3d382f;padding-top:18px;max-width:760px;}
+
+  .kbd{font-family:"SF Mono",ui-monospace,Menlo,monospace;font-size:12.5px;background:#eef1f4;border:1px solid #dfe3e8;border-radius:5px;padding:1px 6px;color:#333;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="brand"><a href="index.html" style="text-decoration:none;color:var(--muted);font-weight:700;">←&nbsp;Portfolio</a><span style="color:#cfd6de;padding:0 10px;">/</span>Amazon <b>Key</b> · AI Content Engine</div>
+    <ul>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#voice">Brand Voice</a></li>
+      <li><a href="#engine">The Engine</a></li>
+      <li><a href="#eval">Evaluation</a></li>
+      <li><a href="#samples">Copy Samples</a></li>
+      <li><a href="#impact">Impact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero" id="overview">
+  <div class="wrap">
+    <div class="eyebrow">Portfolio · AI Creative &amp; Content Manager</div>
+    <h1>A system for drafting <em>on-brand</em> Amazon Key copy, with an editor reviewing every&nbsp;draft.</h1>
+    <p class="lede">
+      This is a working slice of the job. I built a small <b>content engine for Amazon Key</b>: a brand-voice guide that teaches the model how Key sounds,
+      a prompt library and agent that drafts across formats, an evaluation rubric that scores every output, and a human-in-the-loop review layer.
+      Then I ran it and <b>marked up where the drafts were wrong.</b>
+    </p>
+    <div class="byline">
+      <span class="who">Mridhula Srinivasan</span>
+      <span>·</span>
+      <span>AI Content Builder &amp; Storyteller</span>
+      <span>·</span>
+      <a href="https://www.linkedin.com/in/mridhula-srinivasan/">LinkedIn</a>
+      <span>·</span>
+      <a href="mailto:mrisri16@gmail.com">mrisri16@gmail.com</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="n">4</div><div class="l">Brand-voice principles encoded into the agent's system prompt</div></div>
+      <div class="stat"><div class="n">6</div><div class="l">Content formats drafted, scored, and edited, across B2C and B2B</div></div>
+      <div class="stat"><div class="n">6×</div><div class="l">Eval-rubric dimensions every draft is scored against before review</div></div>
+      <div class="stat"><div class="n">70%</div><div class="l">Failure-rate cut this same playbook delivered on my live Amazon Ads platform</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- THE BRIEF -->
+<section id="brief">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">The brief I set myself</div>
+      <h2>Amazon Key's mission is "seamless, authorized access to doors worldwide." The marketing job is to make that feel effortless, at volume.</h2>
+      <p>Key serves two audiences: homeowners and renters (in-garage delivery, smart locks) and the businesses that manage access at scale (Key for Business, multifamily, builders). That is a lot of copy, across many channels, that all has to sound like one calm, trustworthy brand. Doing it by hand does not scale, and letting a model write unsupervised goes off-brand. The approach here is a <b>system</b>: encode the voice, let the agent draft, score every output, and keep a writer at the gate.</p>
+    </div>
+    <div class="grid g3">
+      <div class="card"><div class="num">01</div><h3>Encode the voice</h3><p>A brand-voice and messaging guide the model can follow: principles, lexicon, and compliance rules.</p></div>
+      <div class="card"><div class="num">02</div><h3>Build the agent</h3><p>A system prompt + reusable prompt library that drafts product, email, web, push, social &amp; B2B copy on demand.</p></div>
+      <div class="card"><div class="num">03</div><h3>Score &amp; edit</h3><p>A 6-dimension rubric scores every draft; a human editor makes the call and feeds fixes back into the prompts.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- BRAND VOICE -->
+<section id="voice" class="alt">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">Deliverable 1 · Brand guidelines</div>
+      <h2>The Amazon Key voice, written so a model can follow it</h2>
+      <p>Brand guidelines only matter if they are usable. Each principle below is paired with the behavior it produces in copy, which is how it gets encoded into the agent in the next section.</p>
+    </div>
+
+    <div style="margin-bottom:30px;">
+      <span class="tag">Brand promise</span>
+      <p class="serif" style="font-size:27px;line-height:1.3;color:var(--ink);max-width:740px;margin:14px 0 0;">
+        "Access, handled. Amazon Key gives you secure, authorized access on your terms, so the door is one less thing to think about."
+      </p>
+    </div>
+
+    <div class="grid g2" style="margin-bottom:30px;">
+      <div class="card principle"><div class="dot">1</div><div><h3>Reassuring, never alarming</h3><p>We sell calm and control, not fear. We never lean on theft scares, "porch pirates," or surveillance language. Security is a quiet promise, not a threat.</p></div></div>
+      <div class="card principle"><div class="dot">2</div><div><h3>Effortless &amp; human</h3><p>Short sentences. Plain words. Second person. If a smart-home skeptic wouldn't say it out loud, we don't write it. No jargon, no hype.</p></div></div>
+      <div class="card principle"><div class="dot">3</div><div><h3>Quietly confident</h3><p>We state benefits plainly and let specifics do the convincing. No superlatives, no "revolutionary." Confidence is shown, not announced.</p></div></div>
+      <div class="card principle"><div class="dot">4</div><div><h3>Specific over vague</h3><p>"Your garage opens just long enough for the package, then closes" beats "super secure." Concrete mechanics build more trust than adjectives ever will.</p></div></div>
+    </div>
+
+    <div style="margin-bottom:14px;"><span class="tag">Messaging pillars</span></div>
+    <div class="grid g3" style="margin-bottom:32px;">
+      <div class="card"><h3>Security you don't think about</h3><p>Strong, layered, and working in the background, so peace of mind is the default rather than a setting.</p></div>
+      <div class="card"><h3>Access on your terms</h3><p>You decide who, when, and how. Turn it on, turn it off, watch it happen. Control never leaves your hands.</p></div>
+      <div class="card"><h3>Built into the Amazon you trust</h3><p>Not another gadget to manage. It is part of the delivery and devices experience customers already use.</p></div>
+    </div>
+
+    <div style="margin-bottom:14px;"><span class="tag">Lexicon (the part the model gets wrong most)</span></div>
+    <div class="lex">
+      <div class="col use">
+        <h4>✓ Words we use</h4>
+        <ul>
+          <li>authorized access · on your terms</li>
+          <li>securely · verified driver · time-limited</li>
+          <li>you're in control · turn it on or off anytime</li>
+          <li>delivered inside · off the porch</li>
+          <li>watch it happen · get a notification</li>
+        </ul>
+      </div>
+      <div class="col avoid">
+        <h4>✕ Words we avoid</h4>
+        <ul>
+          <li>porch pirates · theft · stolen</li>
+          <li>100% safe · never worry · guaranteed</li>
+          <li>revolutionary · cutting-edge · game-changing</li>
+          <li>unlock your home to strangers</li>
+          <li>seamless · ultimate · unleash</li>
+        </ul>
+      </div>
+    </div>
+    <p class="small muted" style="margin-top:16px;max-width:740px;">
+      <b>Compliance guardrails (non-negotiable):</b> no absolute security or safety guarantees; no claims about device compatibility, price, or availability unless supplied in the brief; always preserve the customer's control and choice in the message. These become the agent's hard rules.
+    </p>
+  </div>
+</section>
+
+<!-- THE ENGINE -->
+<section id="engine">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">Deliverable 2 · The AI agent &amp; prompt library</div>
+      <h2>The engine: brief in, scored draft out, editor at the gate</h2>
+      <p>The voice guide above isn't a static document. It is compiled into the agent. Below are the workflow, the system prompt, and a sample from the prompt library.</p>
+    </div>
+
+    <!-- architecture -->
+    <div style="margin-bottom:14px;"><span class="tag">Content production workflow</span></div>
+    <div class="flow" style="margin-bottom:8px;">
+      <div class="node"><div class="ic" style="font-weight:800;color:var(--key);">1</div><div class="t">Brief intake</div><div class="s">Format, audience, product facts</div></div>
+      <div class="arrow">→</div>
+      <div class="node"><div class="ic" style="font-weight:800;color:var(--key);">2</div><div class="t">Retrieve</div><div class="s">Brand guide + verified facts</div></div>
+      <div class="arrow">→</div>
+      <div class="node"><div class="ic" style="font-weight:800;color:var(--key);">3</div><div class="t">Draft agent</div><div class="s">On-brand copy + self-score</div></div>
+      <div class="arrow">→</div>
+      <div class="node"><div class="ic" style="font-weight:800;color:var(--key);">4</div><div class="t">Eval agent</div><div class="s">Rubric score + flags</div></div>
+      <div class="arrow">→</div>
+      <div class="node"><div class="ic" style="font-weight:800;color:var(--key);">5</div><div class="t">Editor</div><div class="s">Approve, fix, or reject</div></div>
+      <div class="arrow">→</div>
+      <div class="node"><div class="ic" style="font-weight:800;color:var(--key);">6</div><div class="t">Publish</div><div class="s">Ship to channel / CMS</div></div>
+    </div>
+    <div class="loopnote">↻&nbsp; <span><b>Feedback loop:</b> every editor fix is logged as an eval example and folded back into the brand guide and prompts, so the agent's first-pass quality improves over time.</span></div>
+
+    <!-- system prompt -->
+    <div style="margin:34px 0 14px;"><span class="tag">The agent's system prompt</span></div>
+    <div class="code">
+<span class="c-muted"># SYSTEM: "Amazon Key Copywriter"</span>
+You are the <b>Amazon Key Copywriter</b>. You draft marketing copy that a human
+editor reviews before anything ships. Your job is on-brand drafts, not final word.
+
+<span class="c-key">VOICE (always):</span>
+• <span class="c-rule">Reassuring, never alarming.</span> Sell calm and control, not fear.
+  Never invoke theft, "porch pirates," or surveillance.
+• <span class="c-rule">Effortless &amp; human.</span> Short sentences, plain words, second person.
+  Banned hype: revolutionary, cutting-edge, seamless, game-changing, ultimate, unleash.
+• <span class="c-rule">Quietly confident.</span> State benefits plainly; let specifics convince.
+• <span class="c-rule">Specific over vague.</span> Prefer concrete mechanics to adjectives.
+
+<span class="c-key">HARD RULES (never violate):</span>
+• <span class="c-rule">No absolute guarantees</span> ("100% safe", "never worry again", "guaranteed").
+  Security is strong, layered, and customer-controlled. Say that instead.
+• <span class="c-rule">No unverified claims.</span> Don't assert device compatibility, price, or
+  availability unless given in FACTS. If missing, write <span class="c-good">[VERIFY: …]</span>.
+• <span class="c-rule">Always preserve customer control</span> in the message.
+• <span class="c-rule">Match the requested format</span>: length, structure, and CTA style.
+
+<span class="c-key">OUTPUT (JSON):</span>
+{ "headline":"", "subhead":"", "body":"", "cta":"",
+  "self_eval": { "voice":1-5, "accuracy":1-5, "compliance_flags":[] } }
+
+Before returning, score your own draft and surface any flags for the reviewer.
+    </div>
+
+    <!-- prompt library -->
+    <div style="margin:34px 0 14px;"><span class="tag">Prompt library: reusable templates</span></div>
+    <div class="grid g3" style="margin-bottom:18px;">
+      <div class="card"><h3 style="font-size:16px;">Product detail</h3><p class="small">Benefit-led PDP copy with mechanics + compatibility CTA.</p></div>
+      <div class="card"><h3 style="font-size:16px;">Lifecycle email</h3><p class="small">Onboarding, first delivery, re-engagement. Written to reduce anxiety.</p></div>
+      <div class="card"><h3 style="font-size:16px;">Web hero</h3><p class="small">B2C &amp; B2B landing headers, job-to-be-done first.</p></div>
+      <div class="card"><h3 style="font-size:16px;">Push / microcopy</h3><p class="small">Glanceable, one fact + one action, no redundancy.</p></div>
+      <div class="card"><h3 style="font-size:16px;">Paid social</h3><p class="small">Calm awareness copy that fits the channel, without fear-bait.</p></div>
+      <div class="card"><h3 style="font-size:16px;">B2B one-pager</h3><p class="small">Property-manager value prop, operational &amp; quantified.</p></div>
+    </div>
+    <div class="code">
+<span class="c-muted"># TEMPLATE: lifecycle_email.v3</span>
+<span class="c-key">TASK:</span> Write a lifecycle email for Amazon Key.
+<span class="c-key">INPUTS:</span> {audience} {journey_stage} {primary_action} {FACTS}
+<span class="c-key">CONSTRAINTS:</span>
+  - Subject ≤ 45 chars · preheader ≤ 90 chars · body ≤ 110 words
+  - Lead with the customer's moment, not the brand.
+  - If {journey_stage} is high-anxiety (e.g., first_delivery),
+    name the worry once, then resolve it with concrete steps + a control toggle.
+  - Exactly one CTA. End on customer control.
+<span class="c-key">RETURN:</span> JSON per system schema + self_eval.
+    </div>
+  </div>
+</section>
+
+<!-- EVALUATION -->
+<section id="eval" class="alt">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">Deliverable 3 · Quality evaluation framework</div>
+      <h2>Every draft is scored before a human ever reads it</h2>
+      <p>Measuring AI output against creative standards only works if the standard is written down. This is the rubric the eval agent and the human editor both use, with the same six dimensions and the same bar.</p>
+    </div>
+
+    <table>
+      <thead><tr><th style="width:24%">Dimension</th><th>What a 5 looks like</th><th style="width:14%">Bar</th></tr></thead>
+      <tbody>
+        <tr><td><b>Brand-voice adherence</b></td><td>Sounds like Key: reassuring, plain, specific. No banned or hype words.<div class="d">The dimension models fail most.</div></td><td><span class="pass">≥ 4</span></td></tr>
+        <tr><td><b>Message accuracy</b></td><td>Every factual claim is supported by the brief's FACTS. No invented features, specs, or numbers.</td><td><span class="pass">= 5</span></td></tr>
+        <tr><td><b>Compliance &amp; claims safety</b></td><td>No absolute guarantees, no privacy overreach, customer control preserved. Any risk is flagged.</td><td><span class="pass">= 5</span></td></tr>
+        <tr><td><b>Format fit</b></td><td>Hits the channel's length, structure, and CTA conventions exactly. A push reads like a push.</td><td><span class="pass">≥ 4</span></td></tr>
+        <tr><td><b>Clarity &amp; concision</b></td><td>One idea per line. Nothing a reader has to re-read. Cut 20% and it still works.</td><td><span class="pass">≥ 4</span></td></tr>
+        <tr><td><b>Hook &amp; CTA strength</b></td><td>Opens on the customer's moment; the action is obvious and singular.</td><td><span class="pass">≥ 4</span></td></tr>
+      </tbody>
+    </table>
+
+    <div class="grid g2" style="margin-top:22px;">
+      <div class="card">
+        <h3>The pass gate</h3>
+        <p class="small">A draft is auto-routed to <b>quick approve</b> only if accuracy and compliance score 5, every other dimension is ≥ 4, and there are zero open flags. Anything else goes to <b>full editorial review</b>. Nothing ships unscored.</p>
+      </div>
+      <div class="card">
+        <h3>The feedback loop</h3>
+        <p class="small">When the editor's score disagrees with the agent's self-score, that gap is the signal. Recurring misses (for example, the model keeps reaching for "seamless") become new lexicon rules and few-shot examples. These are versioned, so voice quality can be tracked over time.</p>
+      </div>
+    </div>
+
+    <div style="margin:24px 0 12px;"><span class="tag">LLM-as-judge: eval prompt (excerpt)</span></div>
+    <div class="code">
+<span class="c-muted"># EVAL: score a draft against the Key rubric</span>
+Score the DRAFT 1-5 on each rubric dimension. For voice and compliance,
+<b>quote the exact span</b> that loses points and name the rule it breaks.
+Return: { scores:{…}, flags:[…], verdict:"approve|review|reject",
+          top_fix:"the single highest-impact edit" }
+<span class="c-muted"># A draft that says "100% safe" → compliance:1, flag:"absolute guarantee",
+# verdict:"reject", even if every other score is perfect.</span>
+    </div>
+  </div>
+</section>
+
+<!-- SAMPLES -->
+<section id="samples">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">Deliverable 4 · The writing, across formats</div>
+      <h2>When the machine gets it wrong</h2>
+      <p>This is the part that matters. For each format I ran the agent, then edited as the human at the gate. Left is the <b style="color:var(--red)">raw AI draft</b>; right is what I'd <b style="color:var(--green)">ship</b>; below is the <b style="color:var(--amber)">editorial judgment</b> in between. The edits are the portfolio.</p>
+    </div>
+
+    <!-- 1 PDP -->
+    <div class="sample">
+      <div class="s-top">
+        <div class="row"><span class="pill b2c">B2C</span><span class="pill fmt">Product detail page</span></div>
+        <h3>In-garage delivery: product page</h3>
+        <p class="s-brief"><b>Brief:</b> Convert shoppers browsing in-garage delivery. Audience: homeowners with a compatible garage. Make it feel calm and concrete.</p>
+      </div>
+      <div class="s-body">
+        <div class="draft">
+          <div class="lab">✕ Raw AI draft</div>
+          <div class="copy">
+            <span class="h">Never Worry About Package Theft Again!</span>
+            <span class="sub">With Amazon Key, your packages are 100% safe and secure, every single time. Say goodbye to porch pirates forever and enjoy total peace of mind with the most advanced delivery technology available.</span>
+            It's revolutionary, seamless, and completely changes the way you receive deliveries.
+            <span class="cta">Buy Now</span>
+          </div>
+        </div>
+        <div class="ship">
+          <div class="lab">✓ Shipped (edited)</div>
+          <div class="copy">
+            <span class="h">Your packages, delivered inside your garage.</span>
+            <span class="sub">Amazon Key lets your driver place deliveries securely in your garage, off the porch and out of the weather before you're even home.</span>
+            <span class="slabel">How it works</span>
+            <ul>
+              <li><b>Watch it happen.</b> Get a notification when delivery is on the way, and again once it's inside, with a video clip if you have a compatible camera.</li>
+              <li><b>You're always in control.</b> Open or close your garage from the app, and turn delivery access on or off anytime.</li>
+              <li><b>Works with the garage you have.</b> Connects to compatible myQ-enabled openers, so there's no new hardware to buy.</li>
+            </ul>
+            <span class="cta">See if your garage is compatible</span>
+          </div>
+        </div>
+      </div>
+      <div class="note">
+        <div class="lab">✍ Editor's note</div>
+        <p>Three problems. <b>(1) Absolute guarantees.</b> "100% safe," "never worry again," and "forever" are claims we can't make, and the rubric rejects them. <b>(2) Fear and hype.</b> "Porch pirates," "revolutionary," and "seamless" break the voice and read as anxious and salesy. <b>(3) No substance.</b> The reader never learns how it works. The edit replaces the hype with the mechanics, and swaps "Buy Now" for the real next step, a compatibility check.</p>
+      </div>
+    </div>
+
+    <!-- 2 Email -->
+    <div class="sample">
+      <div class="s-top">
+        <div class="row"><span class="pill b2c">B2C</span><span class="pill fmt">Lifecycle email</span></div>
+        <h3>First in-garage delivery: onboarding email</h3>
+        <p class="s-brief"><b>Brief:</b> Reassure a new user before their first garage delivery, which is the highest-anxiety moment in the journey. Set expectations and hand over control.</p>
+      </div>
+      <div class="s-body">
+        <div class="draft">
+          <div class="lab">✕ Raw AI draft</div>
+          <div class="copy">
+            <span class="slabel">Subject</span>
+            <span class="h">Your Amazon Key delivery is coming! 🎉</span>
+            <span class="sub">Hi there! Thanks for signing up for Amazon Key. Your first in-garage delivery is on its way. Our technology is super secure, so you don't need to worry about anything. Sit back, relax, and let us handle everything for you. We're so excited to have you!</span>
+            <span class="cta">Learn More</span>
+          </div>
+        </div>
+        <div class="ship">
+          <div class="lab">✓ Shipped (edited)</div>
+          <div class="copy">
+            <span class="slabel">Subject</span>
+            <span class="h">What to expect with your first garage delivery</span>
+            <span class="slabel">Preheader</span>
+            <span class="sub">You're in control the whole way through.</span>
+            Hi Mridhula,<br><br>
+            Your first in-garage delivery is set for Thursday. Here's exactly how it goes:
+            <ol>
+              <li>We text you when your driver is about 10 minutes away.</li>
+              <li>Your garage opens just long enough for the package, then closes on its own.</li>
+              <li>You get a confirmation, and a video clip if you have a compatible camera, the moment it's done.</li>
+            </ol>
+            Prefer the porch this time? Switch off garage delivery for any order in the app, anytime.
+            <span class="cta">Open the Key app</span>
+          </div>
+        </div>
+      </div>
+      <div class="note">
+        <div class="lab">✍ Editor's note</div>
+        <p>The draft's "super secure, don't worry" actually <b>raises</b> anxiety: it names the fear without answering it, at the moment trust is most fragile. It also centers the company ("we're so excited") instead of the customer. The edit does the one job this email has: <b>walk the customer through the steps and give them the off-switch.</b> The subject line changes from brand hype to a plain promise of clarity.</p>
+      </div>
+    </div>
+
+    <!-- 3 B2B web hero -->
+    <div class="sample">
+      <div class="s-top">
+        <div class="row"><span class="pill b2b">B2B</span><span class="pill fmt">Web hero</span></div>
+        <h3>Key for Business: landing page hero</h3>
+        <p class="s-brief"><b>Brief:</b> Landing hero for property managers. Let verified drivers into building common areas; cut buzzer interruptions, missed deliveries, and front-desk load.</p>
+      </div>
+      <div class="s-body">
+        <div class="draft">
+          <div class="lab">✕ Raw AI draft</div>
+          <div class="copy">
+            <span class="h">Revolutionize Your Building's Delivery Experience</span>
+            <span class="sub">Amazon Key for Business is the ultimate solution for property managers who want to eliminate all delivery problems and provide the best possible experience for their residents. Sign up today and transform your property!</span>
+            <span class="cta">Sign Up Today</span>
+          </div>
+        </div>
+        <div class="ship">
+          <div class="lab">✓ Shipped (edited)</div>
+          <div class="copy">
+            <span class="h">Let deliveries in. Keep everything else out.</span>
+            <span class="sub">Amazon Key for Business gives delivery drivers secure, time-limited access to your building's common areas, so packages make it inside, residents stop buzzing in strangers, and your team stops fielding delivery calls.</span>
+            <ul>
+              <li>Provided and installed by Amazon at no cost to qualified properties.</li>
+              <li>Access is logged and limited to verified drivers during delivery windows.</li>
+              <li>Works alongside the access system you already run.</li>
+            </ul>
+            <span class="cta">Check if your property qualifies</span>
+          </div>
+        </div>
+      </div>
+      <div class="note">
+        <div class="lab">✍ Editor's note</div>
+        <p>"Revolutionize, ultimate, eliminate all, best possible, transform" are five superlatives a competitor could paste in, and they carry <b>no information</b>. Property managers buy on operations: fewer interruptions, controlled access, and less work per resident. The edit leads with that, makes one clear promise in the headline, and replaces the empty CTA with a qualifying step.</p>
+      </div>
+    </div>
+
+    <!-- 4 Push + Social side by side via two samples -->
+    <div class="sample">
+      <div class="s-top">
+        <div class="row"><span class="pill b2c">B2C</span><span class="pill fmt">Push notification</span></div>
+        <h3>Delivery complete: push microcopy</h3>
+        <p class="s-brief"><b>Brief:</b> Tell the customer their garage delivery is done. Glanceable, calm, one action.</p>
+      </div>
+      <div class="s-body">
+        <div class="draft">
+          <div class="lab">✕ Raw AI draft</div>
+          <div class="copy">
+            <span class="sub">Success! 🎉 Your package has been securely delivered inside your garage by Amazon Key's secure delivery system. Tap here now to view all the details and watch your delivery video!</span>
+          </div>
+        </div>
+        <div class="ship">
+          <div class="lab">✓ Shipped (edited)</div>
+          <div class="copy">
+            <span class="h">Delivered. It's in your garage</span>
+            <span class="sub">Your order is inside and your garage is closed. Tap to watch the clip.</span>
+          </div>
+        </div>
+      </div>
+      <div class="note">
+        <div class="lab">✍ Editor's note</div>
+        <p>A push gets a half-second glance. The draft runs three lines, says "secure" twice, and exclaims over a routine event. The edit is <b>one fact and one optional action</b>. The phrase "your garage is closed" carries the reassurance without using the word "secure."</p>
+      </div>
+    </div>
+
+    <!-- 5 Social -->
+    <div class="sample">
+      <div class="s-top">
+        <div class="row"><span class="pill b2c">B2C</span><span class="pill fmt">Paid social · Instagram</span></div>
+        <h3>In-garage delivery: awareness ad</h3>
+        <p class="s-brief"><b>Brief:</b> Short awareness ad introducing in-garage delivery to people who've never heard of it.</p>
+      </div>
+      <div class="s-body">
+        <div class="draft">
+          <div class="lab">✕ Raw AI draft</div>
+          <div class="copy">
+            <span class="sub">📦 Tired of stolen packages?? 😱 Amazon Key In-Garage Delivery is HERE to save the day! Never deal with porch pirates again!! 🚀 The future of delivery is FINALLY here. Link in bio!! 👀🔥</span>
+          </div>
+        </div>
+        <div class="ship">
+          <div class="lab">✓ Shipped (edited)</div>
+          <div class="copy">
+            <span class="slabel">Primary text</span>
+            <span class="sub">Your deliveries, waiting safely inside your garage instead of out on the porch. That's Amazon Key.</span>
+            <span class="slabel">Headline</span>
+            <span class="h" style="margin-bottom:8px;">Delivered inside, not outside</span>
+            <span class="cta">Learn more</span>
+          </div>
+        </div>
+      </div>
+      <div class="note">
+        <div class="lab">✍ Editor's note</div>
+        <p>The emoji and fear-bait ("stolen packages," "porch pirates") are the opposite of the brand. Key sells <b>calm</b>, and a wall of emoji reads like a discount infomercial, not an Amazon device. The edit keeps one clear image of the benefit. Sounding native to the channel does not mean dropping the voice.</p>
+      </div>
+    </div>
+
+    <!-- 6 Long-form -->
+    <div class="sample">
+      <div class="s-top">
+        <div class="row"><span class="pill b2c">Brand</span><span class="pill fmt">Long-form · blog / POV</span></div>
+        <h3>Brand POV piece: intro</h3>
+        <p class="s-brief"><b>Brief:</b> Open a long-form blog post about why "access" is worth rethinking, building brand authority without selling.</p>
+      </div>
+      <div class="s-body">
+        <div class="draft">
+          <div class="lab">✕ Raw AI draft</div>
+          <div class="copy">
+            <span class="h">The Future of Smart Home Access is Here</span>
+            <span class="sub">In today's fast-paced world, technology is changing everything, and home access is no exception. Amazon Key is leveraging cutting-edge innovation to revolutionize the way we think about our doors. In this article, we'll explore the many benefits of this game-changing technology.</span>
+          </div>
+        </div>
+        <div class="ship">
+          <div class="lab">✓ Shipped (edited)</div>
+          <div class="copy">
+            <span class="h">Access shouldn't be something you think about</span>
+            <span class="sub">A door works best when you forget it's there. You don't think about the lock when your hands are full of groceries, or about the front desk when a package is sitting in a hallway three floors down, until something goes wrong.</span>
+            Most "smart" access asks for the opposite: more apps, more codes, more things to manage. We started from a simpler idea: the best access is the kind you authorize once and never have to manage again. Here is what that looks like, and what we got wrong along the way.
+          </div>
+        </div>
+      </div>
+      <div class="note">
+        <div class="lab">✍ Editor's note</div>
+        <p>The draft is the default LLM "thought-leadership" intro: "in today's fast-paced world," several hype words, and an opening that announces it is an opening. The edit <b>opens on a concrete image</b> (hands full of groceries), states a clear point of view, and admits the brand got things wrong, which reads as more credible than a superlative.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- IMPACT -->
+<section id="impact" class="alt">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="kicker">How I'd run this at Amazon Key</div>
+      <h2>From demo to production: what I'd own and measure</h2>
+      <p>This page is a one-person proof. In my current role I run the production version of exactly this playbook on a live Amazon Ads content platform. Here's how that translates to owning Key's written-content workflow.</p>
+    </div>
+
+    <div class="card" style="margin-bottom:24px;">
+      <div class="metric"><div class="mk">First-pass acceptance</div><div class="mv">% of drafts an editor approves with no edits. Target ramp <b>~40% to 75%</b> as the feedback loop matures. This is the clearest signal the agent is learning the voice.</div></div>
+      <div class="metric"><div class="mk">Brand-voice score</div><div class="mv">Rolling average on the 6-dimension rubric. Hold the line at <b>≥ 4.5 / 5</b>; investigate any channel that drifts.</div></div>
+      <div class="metric"><div class="mk">Editor edit-distance</div><div class="mv">How much a human changes each draft. Should <b>trend down</b> per format over time; spikes flag a stale prompt or a new product nuance.</div></div>
+      <div class="metric"><div class="mk">Cycle time / asset</div><div class="mv">Brief to published. The lever for volume and speed, without letting it pull quality down.</div></div>
+      <div class="metric"><div class="mk">Compliance catch-rate</div><div class="mv">Non-compliant or off-brand lines caught <b>before</b> publish. Target: 100%. This is the guardrail that protects the brand at scale.</div></div>
+    </div>
+
+    <div class="callout">
+      <h3>In short</h3>
+      <p>I can <b>write the copy and build the system that drafts it</b>, and review the difference between the two. On my current Amazon Ads platform, the same approach (prompt library, evaluation framework, human review) <b>cut failure rates 70% across 7 workflows.</b> I would bring that system to Amazon Key, tuned to its voice and customers.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <h3>Mridhula Srinivasan</h3>
+    <p style="margin:0;color:#d9d2c6;max-width:680px;">AI Creative Manager · Content Agents &amp; Brand Voice at Scale. I build the systems that draft marketing copy and review the output.</p>
+    <div class="foot-links">
+      <a href="mailto:mrisri16@gmail.com">mrisri16@gmail.com</a>
+      <a href="https://www.linkedin.com/in/mridhula-srinivasan/">LinkedIn</a>
+      <a href="tel:+19725108280">(972) 510-8280</a>
+    </div>
+    <p class="disc">
+      An independent concept piece created by Mridhula Srinivasan to demonstrate approach and craft for the AI Creative &amp; Content Manager role.
+      Not affiliated with, authorized by, or endorsed by Amazon. "Amazon Key" and related product names are used here only to ground the work in a realistic brief;
+      product details (compatibility, availability, program terms) are illustrative and would be verified against current specifications before any real publication.
+    </p>
+  </div>
+</footer>
+
+<script>
+  // active nav highlight
+  const links = [...document.querySelectorAll('nav a')];
+  const map = {};
+  links.forEach(a=>{const id=a.getAttribute('href').slice(1);const el=document.getElementById(id);if(el)map[id]=a;});
+  const obs = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        links.forEach(l=>l.classList.remove('active'));
+        const a=map[e.target.id]; if(a)a.classList.add('active');
+      }
+    });
+  },{rootMargin:'-45% 0px -50% 0px'});
+  Object.values(map).forEach((a)=>{const id=a.getAttribute('href').slice(1);const el=document.getElementById(id);if(el)obs.observe(el);});
+</script>
+</body>
+</html>
